@@ -28,6 +28,14 @@
       out.innerHTML += evt.data + '<br>';
     }
 
+    const message = {
+      "userName": "ユーザ名",
+      "userID": "",
+      "roomID": "",
+      "message": "",
+      "createdAt": "",
+    }
+
     setInterval(function() {
       ws.send('Hello, Server!');
     }, 1000);

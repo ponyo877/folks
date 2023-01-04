@@ -16,6 +16,7 @@ func NewService(r Repository) *Service {
 	}
 }
 
+// Publish
 func (s *Service) Publish(message entity.Message) error {
 	messageBinary, err := message.EncodeMessage()
 	if err != nil {

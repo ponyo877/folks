@@ -8,8 +8,9 @@ import (
 
 type Message struct {
 	ID        UID
-	UserID    UID
-	RoomID    UID
+	UserName  Text
+	UserHash  Hash
+	RoomName  Text
 	Message   Text
 	CreatedAt time.Time
 }
@@ -25,15 +26,13 @@ func (message *Message) EncodeMessage() ([]byte, error) {
 }
 
 var ErrorMessage = Message{
-	ID:     ErrorUID,
-	UserID: ErrorUID,
-	RoomID: ErrorUID,
-	Message: Text{
-		Value: "ErrorMessage",
-	},
+	ID:        ErrorUID,
+	UserHash:  NewHash("ErrorMessage"),
+	RoomName:  TextToString("ErrorMessage"),
+	Message:   TextToString("ErrorMessage"),
 	CreatedAt: time.Time{},
 }
 
 func (message *Message) MessageText() string {
-	return message.Message.Value
+	return message.Message.String()
 }

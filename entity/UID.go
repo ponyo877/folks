@@ -1,13 +1,29 @@
 package entity
 
+import "github.com/google/uuid"
+
 type UID struct {
-	Value string
+	value uuid.UUID
 }
 
-func NewUID(value string) UID {
+// NewUID
+func NewUID() UID {
 	return UID{
-		Value: value,
+		value: uuid.New(),
 	}
 }
 
-var ErrorUID = NewUID("ERROR")
+// StringToID
+func StringToID(s string) (UID, error) {
+	UUID, err := uuid.Parse(s)
+	return UID{
+		value: UUID,
+	}, err
+}
+
+// String
+func (i UID) String() string {
+	return i.value.String()
+}
+
+var ErrorUID, _ = StringToID("00000000-0000-0000-0000-000000000000")
