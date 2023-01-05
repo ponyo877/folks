@@ -4,8 +4,8 @@ type Text struct {
 	value string
 }
 
-// TextToString
-func TextToString(value string) Text {
+// StringToText
+func StringToText(value string) Text {
 	return Text{
 		value: value,
 	}

@@ -17,6 +17,13 @@ func NewHash(word string) Hash {
 	}
 }
 
+// StringToHash
+func StringToHash(value string) Hash {
+	return Hash{
+		value: value,
+	}
+}
+
 func (hash *Hash) String() string {
 	return hash.value
 }

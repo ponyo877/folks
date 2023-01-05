@@ -39,11 +39,13 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 			for {
 				select {
 				case message := <-messageChannel:
-					messageResponcePresenter, err := presenter.MarshalMessage(message)
+					log.Infof("MessageResponce: %v", message)
+					messageResponcePresenter := presenter.MarshalMessage(message)
 					if err != nil {
 						log.Errorf("PickMessageに失敗しました: %v", err)
 					}
-					if err := session.Conn.WriteJSON(messageResponcePresenter); err != nil {
+					// log.Infof("MessageResponce: %v", message)
+					if err := session.Conn.WriteJSON(&messageResponcePresenter); err != nil {
 						log.Errorf("WebSocketのメッセージの送信に失敗しました: %v", err)
 					}
 					// if err := session.Conn.WriteMessage(websocket.TextMessage, []byte(message.MessageText())); err != nil {
@@ -58,11 +60,11 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 				var messageRequestPresenter presenter.MessageRequestPresenter
 				if err := session.Conn.ReadJSON(&messageRequestPresenter); err != nil {
 					log.Errorf("WebSocketのメッセージの受信に失敗しました: %v", err)
+					continue
 				}
-				var message entity.Message
-				if err := presenter.UnmarshalMessage(messageRequestPresenter, &message); err != nil {
-					log.Errorf("UnmarshalMessageに失敗しました: %v", err)
-				}
+				log.Infof("MessageRequestPresenter: %v", messageRequestPresenter)
+				message := presenter.UnmarshalMessage(&messageRequestPresenter)
+				log.Infof("MessageRequest: %v", message)
 				if err := service.Publish(message); err != nil {
 					log.Errorf("WebSocketのメッセージの受信に失敗しました: %v", err)
 				}

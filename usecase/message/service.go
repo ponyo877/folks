@@ -17,13 +17,12 @@ func NewService(r Repository) *Service {
 }
 
 // Publish
-func (s *Service) Publish(message entity.Message) error {
-	messageBinary, err := message.EncodeMessage()
+func (s *Service) Publish(message *entity.Message) error {
+	messageBinary, err := entity.EncodeMessage(message)
 	if err != nil {
 		return err
 	}
-	s.repository.Publish(messageBinary)
-	return nil
+	return s.repository.Publish(messageBinary)
 }
 
 // Subscribe

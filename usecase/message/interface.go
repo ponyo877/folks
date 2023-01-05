@@ -21,5 +21,5 @@ type Repository interface {
 // UseCase interface
 type UseCase interface {
 	Subscribe(messageChannel chan *entity.Message) error
-	Publish(message entity.Message) error
+	Publish(message *entity.Message) error
 }

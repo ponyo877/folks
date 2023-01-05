@@ -25,20 +25,20 @@ type MessageResponcePresenter struct {
 }
 
 // UnmarshalMessage
-func UnmarshalMessage(messageRequestPresenter MessageRequestPresenter, message *entity.Message) error {
-	message = &entity.Message{
+func UnmarshalMessage(messageRequestPresenter *MessageRequestPresenter) *entity.Message {
+	message := &entity.Message{
 		ID:        entity.NewUID(),
-		UserName:  entity.TextToString(messageRequestPresenter.UserName),
+		UserName:  entity.StringToText(messageRequestPresenter.UserName),
 		UserHash:  entity.NewHash(messageRequestPresenter.IPAddress),
-		RoomName:  entity.TextToString(messageRequestPresenter.RoomName),
-		Message:   entity.TextToString(messageRequestPresenter.Message),
+		RoomName:  entity.StringToText(messageRequestPresenter.RoomName),
+		Message:   entity.StringToText(messageRequestPresenter.Message),
 		CreatedAt: time.Now(),
 	}
-	return nil
+	return message
 }
 
 // MarshalMessage
-func MarshalMessage(message *entity.Message) (MessageResponcePresenter, error) {
+func MarshalMessage(message *entity.Message) MessageResponcePresenter {
 	messagePresenter := MessageResponcePresenter{
 		ID:        message.ID.String(),
 		UserName:  message.UserName.String(),
@@ -47,5 +47,5 @@ func MarshalMessage(message *entity.Message) (MessageResponcePresenter, error) {
 		Message:   message.MessageText(),
 		CreatedAt: message.CreatedAt,
 	}
-	return messagePresenter, nil
+	return messagePresenter
 }

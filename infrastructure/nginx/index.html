@@ -28,17 +28,25 @@
       out.innerHTML += evt.data + '<br>';
     }
 
-    const message = {
-      "userName": "ユーザ名",
-      "userID": "",
-      "roomID": "",
-      "message": "",
-      "createdAt": "",
-    }
+    // var script = document.createElement('script');
+    // script.src = 'https://ipinfo.io/?callback=callback'
+    // document.head.appendChild(script);
 
+    // function callback(data) {
+    //   const ip_address = data.ip;
+    // };
+    var ip_address = "127.0.0.1"
+  
+    var message = {
+      "userName": "ユーザ名",
+      "ipAddress": ip_address,
+      "roomName": "ルーム名",
+      "message": "テストメッセージ",
+    }
+    var jsonData = JSON.stringify(message);
     setInterval(function() {
-      ws.send('Hello, Server!');
-    }, 1000);
+      ws.send(jsonData);
+    }, 2000);
   </script>
 </body>
 
