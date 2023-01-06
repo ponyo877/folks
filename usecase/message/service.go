@@ -27,12 +27,11 @@ func (s *Service) Publish(message *entity.Message) error {
 
 // Subscribe
 func (s *Service) Subscribe(messageChannel chan *entity.Message) error {
-	s.repository.Subscribe(func(binary []byte) {
+	return s.repository.Subscribe(func(binary []byte) {
 		message, err := entity.DecodeMessage(binary)
 		if err != nil {
 			message = &entity.ErrorMessage
 		}
 		messageChannel <- message
 	})
-	return nil
 }

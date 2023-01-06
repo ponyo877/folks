@@ -28,7 +28,13 @@ type SimpleMessage struct {
 func DecodeMessage(binary []byte) (*Message, error) {
 	var simpleMessage SimpleMessage
 	err := msgpack.Unmarshal(binary, &simpleMessage)
+	if err != nil {
+		return &Message{}, nil
+	}
 	ID, err := StringToID(simpleMessage.IDStr)
+	if err != nil {
+		return &Message{}, nil
+	}
 	message := &Message{
 		ID:        ID,
 		UserName:  StringToText(simpleMessage.UserNameStr),

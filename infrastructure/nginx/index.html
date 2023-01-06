@@ -1,52 +1,69 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 
 <head>
   <meta charset="utf-8">
-  <title>WebSocket</title>
+  <title>Folks</title>
 </head>
 
 <body>
-  <p id="output"></p>
+  <h1>Folks</h1>
+  <!-- エンターキーによるボタン押下を行うために、<button>ではなく<form>と<input type="submit">を使用。
+  ボタン押下(=submit)時にページリロードが行われないように、onsubmitの設定の最後に"return false;"を追加。-->
+  <form action="" onsubmit="onsubmitButton_Send(); return false;">
+    <input type="text" id="input_message" autocomplete="off" autofocus /><input type="submit" value="Send" />
+  </form>
+  <ul id="list_message"></ul>
 
   <script>
-    var loc = window.location;
-    var uri = 'ws:';
+    const g_elementInputMessage = document.getElementById("input_message");
+    const g_elementListMessage = document.getElementById("list_message");
 
-    if (loc.protocol === 'https:') {
-      uri = 'wss:';
+    // WebSocketオブジェクト
+    let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8000/v1/message");
+
+    // 「Send」ボタンを押したときの処理
+    function onsubmitButton_Send() {
+      // 送信用テキストHTML要素からメッセージ文字列の取得
+      let strMessage = g_elementInputMessage.value;
+      if (!strMessage) {
+        return;
+      }
+      ipAddress = "127.0.0.1"
+      var message = {
+        "userName": ipAddress,
+        "ipAddress": ipAddress,
+        "roomName": "テストルーム名",
+        "message": strMessage,
+      }
+      // WebSocketを通したメッセージの送信
+      g_socket.send(JSON.stringify(message));
+
+      // 送信用テキストHTML要素の中身のクリア
+      g_elementInputMessage.value = "";
     }
-    uri += '//' + loc.host + ':8000/v1/message';
-    ws = new WebSocket(uri)
 
-    ws.onopen = function() {
-      console.log('Connected')
-    }
+    // WebSocketからメッセージ受信時の処理
+    g_socket.onmessage = (event) => {
+      // テキストデータをJSONデータにデコード
+      let data = JSON.parse(event.data);
 
-    ws.onmessage = function(evt) {
-      var out = document.getElementById('output');
-      out.innerHTML += evt.data + '<br>';
-    }
+      // メッセージの整形
+      // let strMessage = event.data;
+      let strMessage = data["message"] + " (" + data["createdAt"] + ")";
 
-    // var script = document.createElement('script');
-    // script.src = 'https://ipinfo.io/?callback=callback'
-    // document.head.appendChild(script);
+      // 拡散されたメッセージをメッセージリストに追加
+      let elementLi = document.createElement("li");
+      elementLi.textContent = strMessage;
+      g_elementListMessage.append(elementLi);    // リストの一番下に追加
+    };
 
-    // function callback(data) {
-    //   const ip_address = data.ip;
-    // };
-    var ip_address = "127.0.0.1"
-  
-    var message = {
-      "userName": "ユーザ名",
-      "ipAddress": ip_address,
-      "roomName": "ルーム名",
-      "message": "テストメッセージ",
-    }
-    var jsonData = JSON.stringify(message);
-    setInterval(function() {
-      ws.send(jsonData);
-    }, 2000);
+    // WebSocketクローズ時の処理
+    g_socket.onclose = (event) => {
+      // ウェブページを閉じたとき以外のWebSocketクローズは想定外
+      console.error("Unexpected : Chat socket closed.");
+    };
   </script>
 </body>
 
