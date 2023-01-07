@@ -1,11 +1,24 @@
 version: "3.7"
 
 services:
+  app:
+    image: gcr.io/gke-test-287910/folks:v0.0.1
+    ports:
+      - "8000:8000"
+    environment:
+      AP_PORT: 8000
+      MQ_HOST: nats
+      MQ_PORT: 4222
+    depends_on:
+      - nginx
+      - nats
+    volumes:
+      - ./app/data:/srv
   nginx:
-    # image: gcr.io/gke-test-287910/folks-nginx:v0.0.1
-    build:
-      context: nginx
-      dockerfile: Dockerfile
+    image: gcr.io/gke-test-287910/folks-nginx:v0.0.1
+    # build:
+    #   context: nginx
+    #   dockerfile: Dockerfile
     ports:
       - "80:80"
     volumes:
@@ -15,5 +28,4 @@ services:
   nats:
     image: nats:latest # NATS JetStreamも検討
     ports:
-      # - "8222:8222"
       - "4222:4222"
