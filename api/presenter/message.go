@@ -16,12 +16,12 @@ type MessageRequestPresenter struct {
 
 // MessageResponcePresenter
 type MessageResponcePresenter struct {
-	ID        string    `json:"id"`
-	UserName  string    `json:"userName"`
-	UserHash  string    `json:"userHash"`
-	RoomName  string    `json:"roomName"`
-	Message   string    `json:"message"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        string `json:"id"`
+	UserName  string `json:"userName"`
+	UserHash  string `json:"userHash"`
+	RoomName  string `json:"roomName"`
+	Message   string `json:"message"`
+	CreatedAt int64  `json:"createdAt"`
 }
 
 // UnmarshalMessage
@@ -45,7 +45,7 @@ func MarshalMessage(message *entity.Message) MessageResponcePresenter {
 		UserHash:  message.UserHash.String(),
 		RoomName:  message.RoomName.String(),
 		Message:   message.MessageText(),
-		CreatedAt: message.CreatedAt,
+		CreatedAt: message.CreatedAt.UnixMilli(),
 	}
 	return messagePresenter
 }

@@ -3,15 +3,68 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Folks</title>
+  <title>😎チャット😎</title>
+  <style type="text/css" media="screen">
+    .post {
+      position: relative;
+      display: flex;
+      width: 100%;
+      padding: 0 8px 0 5px;
+      margin: 0 auto;
+      table-layout: fixed;
+    }
+    .header {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .name {
+      display: flex;
+      min-width: 0;
+      flex: 0 auto;
+      margin-right: 8px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+    }
+    .timestamp {
+      align-items: center !important;
+      -webkit-box-align: center !important;
+      margin-right: 4px;
+      font-size: .9em;
+      opacity: .6;
+    }
+    .message{
+      transition-property: height;
+      transition-duration: 250ms;
+      transition-timing-function: ease;
+      height: auto;
+      overflow: visible;
+      position: relative;
+      width: 100%;
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.6em;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .icon {
+      padding-right: 10px;
+      text-align: right;
+    }
+    .image {
+      width: 32px;
+      height: 32px;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Folks</h1>
-  <!-- エンターキーによるボタン押下を行うために、<button>ではなく<form>と<input type="submit">を使用。
-  ボタン押下(=submit)時にページリロードが行われないように、onsubmitの設定の最後に"return false;"を追加。-->
-  <form action="" onsubmit="onsubmitButton_Send(); return false;">
-    <input type="text" id="input_message" autocomplete="off" autofocus /><input type="submit" value="Send" />
+  <h1>😎チャット😎</h1>
+  名前 <input type="text" id="text_username" value="ponyo"><br />
+  <form action="" onsubmit="event.preventDefault(); onsubmitButton_Send();">
+    <input type="text" id="input_message" autocomplete="off" autofocus /><input type="submit" value="▶️" />
   </form>
   <ul id="list_message"></ul>
 
@@ -19,49 +72,74 @@
     const g_elementInputMessage = document.getElementById("input_message");
     const g_elementListMessage = document.getElementById("list_message");
 
-    // WebSocketオブジェクト
     let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
     const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8000/v1/message");
 
-    // 「Send」ボタンを押したときの処理
     function onsubmitButton_Send() {
-      // 送信用テキストHTML要素からメッセージ文字列の取得
       let strMessage = g_elementInputMessage.value;
       if (!strMessage) {
         return;
       }
       ipAddress = "127.0.0.1"
       var message = {
-        "userName": ipAddress,
+        "userName": document.getElementById("text_username").value,
         "ipAddress": ipAddress,
         "roomName": "テストルーム名",
         "message": strMessage,
       }
-      // WebSocketを通したメッセージの送信
       g_socket.send(JSON.stringify(message));
-
-      // 送信用テキストHTML要素の中身のクリア
       g_elementInputMessage.value = "";
+      return false;
     }
 
-    // WebSocketからメッセージ受信時の処理
+    function getFormatedTime(unixtime) {
+      var date = new Date(unixtime);
+	    return date.toLocaleTimeString();
+    }
+
+    function getPostElement(message) {
+      var messageElement = document.createElement('div');
+      messageElement.className = 'message';
+      messageElement.textContent = message["message"];
+
+      var headerElement = document.createElement('div');
+      headerElement.className = 'header';
+
+      var timestampElement = document.createElement('div');
+      timestampElement.className = 'timestamp';
+      timestampElement.textContent = getFormatedTime(message["createdAt"]);
+
+      var nameElement = document.createElement('div');
+      nameElement.className = 'name';
+      nameElement.textContent = message["userName"];
+
+      var iconElement = document.createElement('div');
+      iconElement.className = 'icon';
+      var iconImage = document.createElement('img')
+      iconImage.src = 'https://d19ta9rijs3cxg.cloudfront.net/wp-content/uploads/sites/2/2018/09/new_default_icon.png'
+      iconImage.className = 'image'
+      iconElement.appendChild(iconImage)
+
+      let postElement = document.createElement("dev");
+      postElement.className = 'post'
+
+      headerElement.appendChild(nameElement)
+      headerElement.appendChild(timestampElement)
+      var notIconElement  = document.createElement('div')
+      notIconElement.appendChild(headerElement)
+      notIconElement.appendChild(messageElement)
+      postElement.appendChild(iconElement)
+      postElement.appendChild(notIconElement)
+
+      return postElement
+    }
+
     g_socket.onmessage = (event) => {
-      // テキストデータをJSONデータにデコード
       let data = JSON.parse(event.data);
-
-      // メッセージの整形
-      // let strMessage = event.data;
-      let strMessage = data["message"] + " (" + data["createdAt"] + ")";
-
-      // 拡散されたメッセージをメッセージリストに追加
-      let elementLi = document.createElement("li");
-      elementLi.textContent = strMessage;
-      g_elementListMessage.append(elementLi);    // リストの一番下に追加
+      g_elementListMessage.append(getPostElement(data));
     };
 
-    // WebSocketクローズ時の処理
     g_socket.onclose = (event) => {
-      // ウェブページを閉じたとき以外のWebSocketクローズは想定外
       console.error("Unexpected : Chat socket closed.");
     };
   </script>

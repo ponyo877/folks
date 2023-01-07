@@ -34,39 +34,48 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 		service.Subscribe(messageChannel)
 
 		session := entity.NewSession(conn)
-		// go writeMessage(session, messageChannel)
+		isClosed := false
+		isDone := make(chan struct{}, 1)
+
+		session.Conn.SetCloseHandler(func(code int, text string) error {
+			isClosed = true
+			isDone <- struct{}{}
+			return nil
+		})
+
+		// サーバ->クライアント
 		go func() {
 			for {
 				select {
 				case message := <-messageChannel:
-					log.Infof("MessageResponce: %v", message)
+					log.Infof("message: %v", message)
 					messageResponcePresenter := presenter.MarshalMessage(message)
 					if err != nil {
 						log.Errorf("PickMessageに失敗しました: %v", err)
 					}
-					// log.Infof("MessageResponce: %v", message)
 					if err := session.Conn.WriteJSON(&messageResponcePresenter); err != nil {
-						log.Errorf("WebSocketのメッセージの送信に失敗しました: %v", err)
+						log.Errorf("WebSocketのメッセージの書込に失敗しました: %v", err)
 					}
-					// if err := session.Conn.WriteMessage(websocket.TextMessage, []byte(message.MessageText())); err != nil {
-					// 	log.Errorf("WebSocketのメッセージの送信に失敗しました: %v", err)
-					// }
+				case <-isDone:
+					return
 				}
 			}
 		}()
-		// go readMessage(session)
+		// クライアント->サーバ
 		go func() {
+			defer session.Conn.Close()
 			for {
+				if isClosed {
+					return
+				}
 				var messageRequestPresenter presenter.MessageRequestPresenter
 				if err := session.Conn.ReadJSON(&messageRequestPresenter); err != nil {
 					log.Errorf("WebSocketのメッセージの受信に失敗しました: %v", err)
 					continue
 				}
-				log.Infof("MessageRequestPresenter: %v", messageRequestPresenter)
 				message := presenter.UnmarshalMessage(&messageRequestPresenter)
-				log.Infof("MessageRequest: %v", message)
 				if err := service.Publish(message); err != nil {
-					log.Errorf("WebSocketのメッセージの受信に失敗しました: %v", err)
+					log.Errorf("WebSocketのメッセージの出版に失敗しました: %v", err)
 				}
 			}
 		}()
