@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -45,6 +46,11 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 
 		// サーバ->クライアント
 		go func() {
+			ticker := time.NewTicker(5 * time.Second)
+			defer func() {
+				ticker.Stop()
+				session.Conn.Close()
+			}()
 			for {
 				select {
 				case message := <-messageChannel:
@@ -58,6 +64,11 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 					}
 				case <-isDone:
 					return
+				case <-ticker.C:
+					log.Infof("PingMessage :%v", websocket.PingMessage)
+					if err := session.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+						return
+					}
 				}
 			}
 		}()

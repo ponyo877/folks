@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -21,7 +23,11 @@ func main() {
 	if err != nil {
 		log.Panicf("LoadNatsConfigに失敗しました: %v", err)
 	}
-	mq, err := nats.Connect("nats://" + natsConfig.MQHost + ":" + natsConfig.MQPort)
+	mq, err := nats.Connect(
+		"nats://"+natsConfig.MQHost+":"+natsConfig.MQPort,
+		nats.PingInterval(20*time.Second),
+		nats.MaxPingsOutstanding(5),
+	)
 	if err != nil {
 		log.Panicf("NATSの接続に失敗しました: %v", err)
 	}
