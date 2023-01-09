@@ -11,6 +11,7 @@ import (
 	"github.com/ponyo877/folks/repository"
 	"github.com/ponyo877/folks/usecase/message"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/nats-io/nats.go"
 )
 
@@ -31,8 +32,17 @@ func main() {
 	if err != nil {
 		log.Panicf("NATSの接続に失敗しました: %v", err)
 	}
+	redisConfig, err := config.LoadRedisConfig()
+	if err != nil {
+		log.Panicf("LoadRedisConfigに失敗しました: %v", err)
+	}
+	kvs := redis.NewClient(&redis.Options{
+		Addr:     redisConfig.KVSHost + ":" + redisConfig.KVSPort,
+		Password: redisConfig.KVSPassword,
+		DB:       redisConfig.KVSDatabase,
+	})
 
-	messageRepository := repository.NewMessageNats(mq)
+	messageRepository := repository.NewMessageRepository(mq, kvs)
 	messageService := message.NewService(messageRepository)
 
 	e := echo.New()

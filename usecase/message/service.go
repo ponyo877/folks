@@ -22,6 +22,10 @@ func (s *Service) Publish(message *entity.Message) error {
 	if err != nil {
 		return err
 	}
+	testRoomUID, _ := entity.StringToID("00000000-0000-0000-0000-000000000001")
+	if err := s.repository.Append(testRoomUID, message); err != nil {
+		return err
+	}
 	return s.repository.Publish(messageBinary)
 }
 
@@ -34,4 +38,8 @@ func (s *Service) Subscribe(messageChannel chan *entity.Message) error {
 		}
 		messageChannel <- message
 	})
+}
+
+func (s *Service) ListRecent(ID entity.UID) ([]*entity.Message, error) {
+	return s.repository.ListRecent(ID, 100)
 }
