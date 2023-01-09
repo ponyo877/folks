@@ -16,9 +16,6 @@ services:
       - ./app/data:/srv
   nginx:
     image: gcr.io/gke-test-287910/folks-nginx:v0.0.1
-    # build:
-    #   context: nginx
-    #   dockerfile: Dockerfile
     ports:
       - "80:80"
     volumes:
