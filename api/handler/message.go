@@ -33,6 +33,15 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 		}
 		messageChannel := make(chan *entity.Message)
 		service.Subscribe(messageChannel)
+		go func() {
+			messages, err := service.ListRecent(entity.ErrorUID)
+			if err != nil {
+				log.Errorf("ListRecentに失敗しました: %v", err)
+			}
+			for _, message := range messages {
+				messageChannel <- message
+			}
+		}()
 
 		session := entity.NewSession(conn)
 		isClosed := false
@@ -51,19 +60,6 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 				ticker.Stop()
 				session.Conn.Close()
 			}()
-			{
-				messages, err := service.ListRecent(entity.ErrorUID)
-				for _, message := range messages {
-					// 記述が重複しているのでusecaseにまとめる必要あり
-					messageResponcePresenter := presenter.MarshalMessage(message)
-					if err != nil {
-						log.Errorf("PickMessageに失敗しました: %v", err)
-					}
-					if err := session.Conn.WriteJSON(&messageResponcePresenter); err != nil {
-						log.Errorf("WebSocketのメッセージの書込に失敗しました: %v", err)
-					}
-				}
-			}
 			for {
 				select {
 				case message := <-messageChannel:
@@ -78,8 +74,8 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 				case <-isDone:
 					return
 				case <-ticker.C:
-					log.Infof("PingMessage :%v", websocket.PingMessage)
 					if err := session.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+						log.Errorf("Pingに失敗しました :%v", err)
 						return
 					}
 				}

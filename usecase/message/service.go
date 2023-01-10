@@ -40,6 +40,8 @@ func (s *Service) Subscribe(messageChannel chan *entity.Message) error {
 	})
 }
 
+// ListRecent
 func (s *Service) ListRecent(ID entity.UID) ([]*entity.Message, error) {
-	return s.repository.ListRecent(ID, 100)
+	testRoomUID, _ := entity.StringToID("00000000-0000-0000-0000-000000000001")
+	return s.repository.ListRecent(testRoomUID, 100)
 }
