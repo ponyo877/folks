@@ -9,6 +9,10 @@ services:
       AP_PORT: 8000
       MQ_HOST: nats
       MQ_PORT: 4222
+      KVS_PASSWORD: password
+      KVS_HOST: redis
+      KVS_DATABASE: 0
+      KVS_PORT: 6379
     depends_on:
       - nginx
       - nats

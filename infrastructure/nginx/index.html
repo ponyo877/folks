@@ -74,8 +74,8 @@
     const g_elementListMessage = document.getElementById("list_message");
 
     let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/message");
-    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/message");
+    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/message");
+    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/message");
 
     function onsubmitButton_Send() {
       let strMessage = g_elementInputMessage.value;
