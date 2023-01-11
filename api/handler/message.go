@@ -67,9 +67,11 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 					messageResponcePresenter := presenter.MarshalMessage(message)
 					if err != nil {
 						log.Errorf("PickMessageに失敗しました: %v", err)
+						return
 					}
 					if err := session.Conn.WriteJSON(&messageResponcePresenter); err != nil {
 						log.Errorf("WebSocketのメッセージの書込に失敗しました: %v", err)
+						return
 					}
 				case <-isDone:
 					return
@@ -90,8 +92,11 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 				}
 				var messageRequestPresenter presenter.MessageRequestPresenter
 				if err := session.Conn.ReadJSON(&messageRequestPresenter); err != nil {
-					log.Errorf("WebSocketのメッセージの受信に失敗しました: %v", err)
-					continue
+					log.Infof("WebSocketのメッセージの受信に失敗しました: %v", err)
+					if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+						log.Errorf("WebSocketのメッセージの受信が想定外の原因で失敗しました: %v", err)
+					}
+					return
 				}
 				message := presenter.UnmarshalMessage(&messageRequestPresenter)
 				if err := service.Publish(message); err != nil {
