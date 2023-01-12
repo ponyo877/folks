@@ -10,7 +10,7 @@ import (
 type MessageRequestPresenter struct {
 	UserName  string `json:"userName"`
 	IPAddress string `json:"ipAddress"`
-	RoomName  string `json:"roomName"`
+	RoomID    string `json:"roomID"`
 	Message   string `json:"message"`
 }
 
@@ -19,18 +19,22 @@ type MessageResponcePresenter struct {
 	ID        string `json:"id"`
 	UserName  string `json:"userName"`
 	UserHash  string `json:"userHash"`
-	RoomName  string `json:"roomName"`
+	RoomID    string `json:"roomID"`
 	Message   string `json:"message"`
 	CreatedAt int64  `json:"createdAt"`
 }
 
 // UnmarshalMessage
 func UnmarshalMessage(messageRequestPresenter *MessageRequestPresenter) *entity.Message {
+	roomID, err := entity.StringToID(messageRequestPresenter.RoomID)
+	if err != nil {
+		return &entity.Message{}
+	}
 	message := &entity.Message{
 		ID:        entity.NewUID(),
 		UserName:  entity.StringToText(messageRequestPresenter.UserName),
 		UserHash:  entity.NewHash(messageRequestPresenter.IPAddress),
-		RoomName:  entity.StringToText(messageRequestPresenter.RoomName),
+		RoomID:    roomID,
 		Message:   entity.StringToText(messageRequestPresenter.Message),
 		CreatedAt: time.Now(),
 	}
@@ -43,7 +47,7 @@ func MarshalMessage(message *entity.Message) MessageResponcePresenter {
 		ID:        message.ID.String(),
 		UserName:  message.UserName.String(),
 		UserHash:  message.UserHash.String(),
-		RoomName:  message.RoomName.String(),
+		RoomID:    message.RoomID.String(),
 		Message:   message.MessageText(),
 		CreatedAt: message.CreatedAt.UnixMilli(),
 	}

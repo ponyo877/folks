@@ -17,31 +17,32 @@ func NewService(r Repository) *Service {
 }
 
 // Publish
-func (s *Service) Publish(message *entity.Message) error {
+func (s *Service) Publish(roomID entity.UID, message *entity.Message) error {
 	messageBinary, err := entity.EncodeMessage(message)
 	if err != nil {
 		return err
 	}
-	testRoomUID, _ := entity.StringToID("00000000-0000-0000-0000-000000000001")
-	if err := s.repository.Append(testRoomUID, message); err != nil {
+	if err := s.repository.Append(roomID, message); err != nil {
 		return err
 	}
-	return s.repository.Publish(messageBinary)
+	return s.repository.Publish(roomID, messageBinary)
 }
 
 // Subscribe
-func (s *Service) Subscribe(messageChannel chan *entity.Message) error {
-	return s.repository.Subscribe(func(binary []byte) {
-		message, err := entity.DecodeMessage(binary)
-		if err != nil {
-			message = &entity.ErrorMessage
-		}
-		messageChannel <- message
-	})
+func (s *Service) Subscribe(roomID entity.UID, messageChannel chan *entity.Message) error {
+	return s.repository.Subscribe(
+		roomID,
+		func(binary []byte) {
+			message, err := entity.DecodeMessage(binary)
+			if err != nil {
+				message = &entity.ErrorMessage
+			}
+			messageChannel <- message
+		},
+	)
 }
 
 // ListRecent
-func (s *Service) ListRecent(ID entity.UID) ([]*entity.Message, error) {
-	testRoomUID, _ := entity.StringToID("00000000-0000-0000-0000-000000000001")
-	return s.repository.ListRecent(testRoomUID, 100)
+func (s *Service) ListRecent(roomID entity.UID) ([]*entity.Message, error) {
+	return s.repository.ListRecent(roomID, 100)
 }

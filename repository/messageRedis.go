@@ -7,17 +7,17 @@ import (
 )
 
 // Append
-func (r *MessageRepository) Append(ID entity.UID, message *entity.Message) error {
+func (r *MessageRepository) Append(roomID entity.UID, message *entity.Message) error {
 	encodedMessage, err := entity.EncodeMessage(message)
 	if err != nil {
 		return err
 	}
-	return r.kvs.RPush(context.Background(), ID.String(), encodedMessage).Err()
+	return r.kvs.RPush(context.Background(), roomID.String(), encodedMessage).Err()
 }
 
 // ListRecent
-func (r *MessageRepository) ListRecent(ID entity.UID, size int64) ([]*entity.Message, error) {
-	preDecodeMessages, err := r.kvs.LRange(context.Background(), ID.String(), -size, -1).Result()
+func (r *MessageRepository) ListRecent(roomID entity.UID, size int64) ([]*entity.Message, error) {
+	preDecodeMessages, err := r.kvs.LRange(context.Background(), roomID.String(), -size, -1).Result()
 	if err != nil {
 		return nil, nil
 	}

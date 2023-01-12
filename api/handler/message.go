@@ -14,12 +14,17 @@ import (
 
 // MakeMessageHandlers
 func MakeMessageHandlers(e *echo.Echo, service message.UseCase) {
-	e.GET("/v1/message", GetMessage(service))
+	e.GET("/v1/message/:roomID", GetMessage(service))
 }
 
 // GetMessage
 func GetMessage(service message.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		roomIDStr := c.Param("roomID")
+		roomID, err := entity.StringToID(roomIDStr)
+		if err != nil {
+			roomID, _ = entity.StringToID("12345678-0000-0000-0000-000000000002")
+		}
 		log.Info("WebSocketの接続を開始します")
 		var upgrader = websocket.Upgrader{
 			ReadBufferSize:  1024,
@@ -32,9 +37,10 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 			return err
 		}
 		messageChannel := make(chan *entity.Message)
-		service.Subscribe(messageChannel)
+		service.Subscribe(roomID, messageChannel)
+		// 過去ログの表示
 		go func() {
-			messages, err := service.ListRecent(entity.ErrorUID)
+			messages, err := service.ListRecent(roomID)
 			if err != nil {
 				log.Errorf("ListRecentに失敗しました: %v", err)
 			}
@@ -52,7 +58,6 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 			isDone <- struct{}{}
 			return nil
 		})
-
 		// サーバ->クライアント
 		go func() {
 			ticker := time.NewTicker(5 * time.Second)
@@ -63,7 +68,7 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 			for {
 				select {
 				case message := <-messageChannel:
-					log.Infof("message: %v", message)
+					log.Infof("[サーバ->クライアント]message: %v", message)
 					messageResponcePresenter := presenter.MarshalMessage(message)
 					if err != nil {
 						log.Errorf("PickMessageに失敗しました: %v", err)
@@ -98,8 +103,10 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 					}
 					return
 				}
+				log.Infof("[クライアント->サーバ]messageRequestPresenter: %v", messageRequestPresenter)
 				message := presenter.UnmarshalMessage(&messageRequestPresenter)
-				if err := service.Publish(message); err != nil {
+				log.Infof("[クライアント->サーバ]message: %v", message)
+				if err := service.Publish(roomID, message); err != nil {
 					log.Errorf("WebSocketのメッセージの出版に失敗しました: %v", err)
 				}
 			}

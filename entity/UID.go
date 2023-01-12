@@ -26,4 +26,4 @@ func (i UID) String() string {
 	return i.value.String()
 }
 
-var ErrorUID, _ = StringToID("00000000-0000-0000-0000-000000000000")
+var ErrorUID, _ = StringToID("12345678-0000-0000-0000-000000000000")

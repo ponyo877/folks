@@ -8,10 +8,10 @@ type Reader interface {
 
 // Writer interface
 type Writer interface {
-	Publish(binary []byte) error
-	Subscribe(f func([]byte)) error
-	Append(ID entity.UID, message *entity.Message) error
-	ListRecent(ID entity.UID, size int64) ([]*entity.Message, error)
+	Publish(roomID entity.UID, binary []byte) error
+	Subscribe(roomID entity.UID, f func([]byte)) error
+	Append(roomID entity.UID, message *entity.Message) error
+	ListRecent(roomID entity.UID, size int64) ([]*entity.Message, error)
 }
 
 // Repository interface
@@ -22,7 +22,7 @@ type Repository interface {
 
 // UseCase interface
 type UseCase interface {
-	Publish(message *entity.Message) error
-	Subscribe(messageChannel chan *entity.Message) error
-	ListRecent(ID entity.UID) ([]*entity.Message, error)
+	Publish(roomID entity.UID, message *entity.Message) error
+	Subscribe(roomID entity.UID, messageChannel chan *entity.Message) error
+	ListRecent(roomID entity.UID) ([]*entity.Message, error)
 }
