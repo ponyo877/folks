@@ -15,4 +15,4 @@
 # vendor/
 
 # Private
-infrastructure/*/data/
+infrastructure/redis/*
