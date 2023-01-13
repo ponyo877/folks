@@ -23,7 +23,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/index.html:/var/www/static/index.html
+      - ./nginx/roomSelect/index.html:/var/www/static/index.html
+      - ./nginx/chatRoom/index.html:/var/www/room/index.html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
   nats:
