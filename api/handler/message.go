@@ -9,16 +9,18 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/ponyo877/folks/api/presenter"
 	"github.com/ponyo877/folks/entity"
-	"github.com/ponyo877/folks/usecase/message"
+	"github.com/ponyo877/folks/usecase/room"
 )
 
-// MakeMessageHandlers
-func MakeMessageHandlers(e *echo.Echo, service message.UseCase) {
-	e.GET("/v1/message/:roomID", GetMessage(service))
+// MakeRoomHandlers
+func MakeRoomHandlers(e *echo.Echo, service room.UseCase) {
+	e.GET("/v1/room/:roomID", ConnectRoom(service))
+	e.GET("/v1/room", ListRoom(service))
+	e.POST("/v1/room", CreateRoom(service))
 }
 
-// GetMessage
-func GetMessage(service message.UseCase) echo.HandlerFunc {
+// ConnectRoom
+func ConnectRoom(service room.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		roomIDStr := c.Param("roomID")
 		roomID, err := entity.StringToID(roomIDStr)
@@ -112,5 +114,29 @@ func GetMessage(service message.UseCase) echo.HandlerFunc {
 			}
 		}()
 		return nil
+	}
+}
+
+// CreateRoom
+func CreateRoom(service room.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		roomPresenter := new(presenter.Room)
+		if err := c.Bind(roomPresenter); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err := c.Validate(roomPresenter); err != nil {
+			return err
+		}
+		if err := service.CreateRoom(entity.NewDisplayName(roomPresenter.DisplayName)); err != nil {
+			return err
+		}
+		return nil
+	}
+}
+
+// ListRoom
+func ListRoom(service room.UseCase) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return service.ListRoom()
 	}
 }

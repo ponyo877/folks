@@ -21,6 +21,14 @@ type RedisConfig struct {
 	KVSPort     string `mapstructure:"KVS_PORT"`
 }
 
+type MysqlConfig struct {
+	DBUser     string `mapstructure:"DB_USER"`
+	DBPassword string `mapstructure:"DB_PASSWORD"`
+	DBHost     string `mapstructure:"DB_HOST"`
+	DBDatabase string `mapstructure:"DB_DATABASE"`
+	DBPort     string `mapstructure:"DB_PORT"`
+}
+
 // LoadNatsConfig
 func LoadNatsConfig() (NatsConfig, error) {
 	viper.AutomaticEnv()
@@ -59,5 +67,20 @@ func LoadRedisConfig() (RedisConfig, error) {
 	}
 	log.Infof("[Redis] pass: %v, host: %v, db: %v, port: %v", config.KVSPassword, config.KVSHost, config.KVSDatabase, config.KVSPort)
 	return config, nil
+}
 
+// LoadMysqlConfig
+func LoadMysqlConfig() (MysqlConfig, error) {
+	viper.AutomaticEnv()
+	viper.BindEnv("DB_USER")
+	viper.BindEnv("DB_PASSWORD")
+	viper.BindEnv("DB_HOST")
+	viper.BindEnv("DB_DATABASE")
+	viper.BindEnv("DB_PORT")
+	var config MysqlConfig
+	if err := viper.Unmarshal(&config); err != nil {
+		return MysqlConfig{}, err
+	}
+	log.Infof("[MySQL] user: %v, pass: %v, host: %v, db: %v, port: %v", config.DBUser, config.DBPassword, config.DBHost, config.DBDatabase, config.DBPort)
+	return config, nil
 }

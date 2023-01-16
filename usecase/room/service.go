@@ -1,10 +1,10 @@
-package message
+package room
 
 import (
 	"github.com/ponyo877/folks/entity"
 )
 
-// Service Message usecase
+// Service Room usecase
 type Service struct {
 	repository Repository
 }
@@ -45,4 +45,14 @@ func (s *Service) Subscribe(roomID entity.UID, messageChannel chan *entity.Messa
 // ListRecent
 func (s *Service) ListRecent(roomID entity.UID) ([]*entity.Message, error) {
 	return s.repository.ListRecent(roomID, 100)
+}
+
+// ListRoom
+func (s *Service) ListRoom() error {
+	return nil
+}
+
+// CreateRoom
+func (s *Service) CreateRoom(displayName entity.DisplayName) error {
+	return nil
 }
