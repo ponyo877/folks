@@ -1,0 +1,6 @@
+CREATE TABLE folks.rooms (
+	id           INT(8)       DEFAULT 0
+	display_name VARCHAR(20)  DEFAULT
+    updated_at   TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    created_at   TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+);

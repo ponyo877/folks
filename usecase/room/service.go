@@ -53,6 +53,6 @@ func (s *Service) ListRoom() error {
 }
 
 // CreateRoom
-func (s *Service) CreateRoom(displayName entity.DisplayName) error {
-	return nil
+func (s *Service) CreateRoom(room entity.Room) error {
+	return s.repository.CreateRoom(room)
 }

@@ -13,7 +13,7 @@ type Writer interface {
 	Publish(roomID entity.UID, binary []byte) error
 	Subscribe(roomID entity.UID, f func([]byte)) error
 	Append(roomID entity.UID, message *entity.Message) error
-	CreateRoom(displayName entity.DisplayName) error
+	CreateRoom(room entity.Room) error
 }
 
 // Repository interface
@@ -28,5 +28,5 @@ type UseCase interface {
 	Subscribe(roomID entity.UID, messageChannel chan *entity.Message) error
 	ListRecent(roomID entity.UID) ([]*entity.Message, error)
 	ListRoom() error
-	CreateRoom(displayName entity.DisplayName) error
+	CreateRoom(room entity.Room) error
 }
