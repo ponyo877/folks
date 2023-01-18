@@ -1,2 +1,2 @@
 # folks
-folks is chat implemented in gRPC
+folks is chat written in Golang
