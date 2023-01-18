@@ -1,7 +1,32 @@
 package presenter
 
-type Room struct {
+import (
+	"github.com/ponyo877/folks/entity"
+)
+
+type RoomPresenter struct {
 	ID          string `json:"id"`
 	DisplayName string `json:"name" validate:"required"`
 	Members     []User `json:"members"`
+}
+
+type RoomPresenterList []*RoomPresenter
+
+// pickRoom
+func pickRoom(room *entity.Room) RoomPresenter {
+	roomPresenter := RoomPresenter{
+		ID:          room.ID.String(),
+		DisplayName: room.DisplayName.String(),
+	}
+	return roomPresenter
+}
+
+// PickRoomList
+func PickRoomList(roomList []*entity.Room) RoomPresenterList {
+	var roomPresenterList RoomPresenterList
+	for _, room := range roomList {
+		roomPresenter := pickRoom(room)
+		roomPresenterList = append(roomPresenterList, &roomPresenter)
+	}
+	return roomPresenterList
 }

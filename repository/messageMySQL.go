@@ -15,21 +15,26 @@ type RoomMySQLPresenter struct {
 
 type RoomMySQLPresenterList []RoomMySQLPresenter
 
+// TableName
+func (p *RoomMySQLPresenter) TableName() string {
+	return "rooms"
+}
+
 // pickRoom
-func (p *RoomMySQLPresenter) pickRoom() (entity.Room, error) {
+func (p *RoomMySQLPresenter) pickRoom() (*entity.Room, error) {
 	roomID, err := entity.StringToID(p.ID)
 	if err != nil {
-		return entity.Room{}, err
+		return nil, err
 	}
-	return entity.Room{
+	return &entity.Room{
 		ID:          roomID,
 		DisplayName: entity.NewDisplayName(p.DisplayName),
 	}, nil
 }
 
 // pickRoomList
-func (p *RoomMySQLPresenterList) pickRoomList() ([]entity.Room, error) {
-	var roomList []entity.Room
+func (p *RoomMySQLPresenterList) pickRoomList() ([]*entity.Room, error) {
+	var roomList []*entity.Room
 	for _, roomMySQLPresenter := range *p {
 		room, err := roomMySQLPresenter.pickRoom()
 		if err != nil {
@@ -41,27 +46,31 @@ func (p *RoomMySQLPresenterList) pickRoomList() ([]entity.Room, error) {
 }
 
 // roomEntity
-func roomEntity(room entity.Room) RoomMySQLPresenter {
-	return RoomMySQLPresenter{
+func roomEntity(room *entity.Room) *RoomMySQLPresenter {
+	return &RoomMySQLPresenter{
 		ID:          room.ID.String(),
 		DisplayName: room.DisplayName.String(),
 	}
 }
 
 // CreateRoom
-func (r *MessageRepository) CreateRoom(room entity.Room) error {
+func (r *MessageRepository) CreateRoom(room *entity.Room) error {
 	return r.rdb.Create(roomEntity(room)).Error
 }
 
 // ListRoom
 func (r *MessageRepository) ListRoom() ([]*entity.Room, error) {
-	// roomStrList, _, err := r.kvs.Scan(context.Background(), 0, "room:*", 0).Result()
-	// if err != nil {
-	// 	return []*entity.Room{}, err
-	// }
-	// var rooms []*entity.Room
-	// for _, roomStr := range roomStrList {
-	// 	rooms = append(rooms, entity.NewRoom(en))
-	// }
-	return []*entity.Room{}, nil
+	var roomMySQLPresenterList RoomMySQLPresenterList
+	if err := r.rdb.Find(&roomMySQLPresenterList).Error; err != nil {
+		return nil, err
+	}
+	return roomMySQLPresenterList.pickRoomList()
+}
+
+func (r *MessageRepository) GetRoom(roomID entity.UID) (*entity.Room, error) {
+	var roomMySQLPresenter RoomMySQLPresenter
+	if err := r.rdb.First(&roomMySQLPresenter, roomID).Error; err != nil {
+		return nil, err
+	}
+	return roomMySQLPresenter.pickRoom()
 }

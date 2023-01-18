@@ -5,8 +5,8 @@ type Room struct {
 	DisplayName DisplayName
 }
 
-func NewRoom(displayName DisplayName) Room {
-	return Room{
+func NewRoom(displayName DisplayName) *Room {
+	return &Room{
 		ID:          NewUID(),
 		DisplayName: displayName,
 	}

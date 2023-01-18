@@ -81,8 +81,8 @@
     const g_elementListMessage = document.getElementById("list_message");
 
     let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room" + "/" + getParam("roomID"));
-    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room" + "/" + getParam("roomID"));
+    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room" + "/" + getParam("roomID"));
+    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room" + "/" + getParam("roomID"));
 
     function onsubmitButton_Send() {
       let strMessage = g_elementInputMessage.value;

@@ -48,11 +48,16 @@ func (s *Service) ListRecent(roomID entity.UID) ([]*entity.Message, error) {
 }
 
 // ListRoom
-func (s *Service) ListRoom() error {
-	return nil
+func (s *Service) ListRoom() ([]*entity.Room, error) {
+	return s.repository.ListRoom()
 }
 
 // CreateRoom
-func (s *Service) CreateRoom(room entity.Room) error {
+func (s *Service) CreateRoom(room *entity.Room) error {
 	return s.repository.CreateRoom(room)
+}
+
+// GetRoom
+func (s *Service) GetRoom(roomID entity.UID) (*entity.Room, error) {
+	return s.repository.GetRoom(roomID)
 }
