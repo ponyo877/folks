@@ -15,4 +15,5 @@
 # vendor/
 
 # Private
-infrastructure/redis/*
+infrastructure/redis/data/*
+infrastructure/mysql/data/*
