@@ -26,7 +26,7 @@ type Repository interface {
 // UseCase interface
 type UseCase interface {
 	Publish(roomID entity.UID, message *entity.Message) error
-	Subscribe(roomID entity.UID, messageChannel chan *entity.Message) error
+	ConnectRoom(roomID entity.UID) (chan *entity.Message, error)
 	ListRecent(roomID entity.UID) ([]*entity.Message, error)
 	ListRoom() ([]*entity.Room, error)
 	CreateRoom(room *entity.Room) error

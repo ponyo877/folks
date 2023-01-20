@@ -67,9 +67,10 @@ func (r *MessageRepository) ListRoom() ([]*entity.Room, error) {
 	return roomMySQLPresenterList.pickRoomList()
 }
 
+// GetRoom
 func (r *MessageRepository) GetRoom(roomID entity.UID) (*entity.Room, error) {
 	var roomMySQLPresenter RoomMySQLPresenter
-	if err := r.rdb.First(&roomMySQLPresenter, roomID).Error; err != nil {
+	if err := r.rdb.First(&roomMySQLPresenter, "id = ?", roomID.String()).Error; err != nil {
 		return nil, err
 	}
 	return roomMySQLPresenter.pickRoom()

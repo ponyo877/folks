@@ -28,9 +28,13 @@ func (s *Service) Publish(roomID entity.UID, message *entity.Message) error {
 	return s.repository.Publish(roomID, messageBinary)
 }
 
-// Subscribe
-func (s *Service) Subscribe(roomID entity.UID, messageChannel chan *entity.Message) error {
-	return s.repository.Subscribe(
+// ConnectRoom
+func (s *Service) ConnectRoom(roomID entity.UID) (chan *entity.Message, error) {
+	if _, err := s.repository.GetRoom(roomID); err != nil {
+		return nil, err
+	}
+	messageChannel := make(chan *entity.Message)
+	s.repository.Subscribe(
 		roomID,
 		func(binary []byte) {
 			message, err := entity.DecodeMessage(binary)
@@ -40,6 +44,7 @@ func (s *Service) Subscribe(roomID entity.UID, messageChannel chan *entity.Messa
 			messageChannel <- message
 		},
 	)
+	return messageChannel, nil
 }
 
 // ListRecent

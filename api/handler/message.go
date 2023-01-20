@@ -24,16 +24,14 @@ func ConnectRoom(service room.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		roomIDStr := c.Param("roomID")
 		roomID, err := entity.StringToID(roomIDStr)
-		// TODO: ここにGetRoomを書く
 		if err != nil {
-			roomID, _ = entity.StringToID("12345678-0000-0000-0000-000000000002")
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
-		conn, err := generateConnection(c.Response(), c.Request())
+		messageChannel, err := service.ConnectRoom(roomID)
 		if err != nil {
-			log.Errorf("WebSocketの接続に失敗しました: %v", err)
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
-		messageChannel := make(chan *entity.Message)
-		service.Subscribe(roomID, messageChannel)
+
 		// 過去ログの表示
 		go func() {
 			messages, err := service.ListRecent(roomID)
@@ -45,6 +43,10 @@ func ConnectRoom(service room.UseCase) echo.HandlerFunc {
 			}
 		}()
 
+		conn, err := generateConnection(c.Response(), c.Request())
+		if err != nil {
+			log.Errorf("WebSocketの接続に失敗しました: %v", err)
+		}
 		session := entity.NewSession(conn)
 		session.Conn.SetCloseHandler(func(code int, text string) error {
 			session.IsClosed = true
