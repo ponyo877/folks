@@ -13,6 +13,7 @@ services:
       KVS_HOST: redis
       KVS_DATABASE: 0
       KVS_PORT: 6379
+      DB_USER: root
       DB_PASSWORD: password
       DB_HOST: mysql
       DB_DATABASE: folks
