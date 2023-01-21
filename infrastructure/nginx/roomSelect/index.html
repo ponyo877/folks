@@ -95,6 +95,7 @@
 
 <body>
     <h1>😎チャット</h1>
+    名前 <input onchange="changeHref()" type="text" id="username"><br />
     <a class="button" href="/room?roomID=e5699ceb-7527-594e-37b2-9fb3284a2a17">チャットルーム1</a>
     <a class="button" href="/room?roomID=94ddd72d-d9b1-aee2-694a-83d10ba1ae7b">チャットルーム2</a>
     <a class="button" href="/room?roomID=2982751d-75fd-6dd5-679f-e7caa08dd0fa">チャットルーム3</a>
@@ -103,6 +104,15 @@
     <a class="button" href="/room?roomID=0bf0769a-7461-05a1-60b6-4dead32e4b6e">チャットルーム6</a>
     <a class="button" href="/room?roomID=b5e69fdb-14ab-8993-88e5-d4782bf592e9">チャットルーム7</a>
     <script>
+        const changeHref = () => {
+            bottons = document.getElementsByClassName("button")
+            userName = document.getElementById("username").value
+            for (let i = 0; i < bottons.length; i++){
+                url = new URL(bottons[i].href);
+                url.searchParams.set("displayName", userName)
+                bottons[i].href = url.toString()
+            }
+        }
     </script>
 </body>
 

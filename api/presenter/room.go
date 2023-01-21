@@ -5,9 +5,13 @@ import (
 )
 
 type RoomPresenter struct {
-	ID          string `json:"id"`
-	DisplayName string `json:"name" validate:"required"`
-	Members     []User `json:"members"`
+	ID          string          `json:"id"`
+	DisplayName string          `json:"name" validate:"required"`
+	Members     []UserPresenter `json:"members"`
+}
+
+type UserPresenter struct {
+	DisplayName string `json:"name"`
 }
 
 type RoomPresenterList []*RoomPresenter
@@ -29,4 +33,12 @@ func PickRoomList(roomList []*entity.Room) RoomPresenterList {
 		roomPresenterList = append(roomPresenterList, &roomPresenter)
 	}
 	return roomPresenterList
+}
+
+// PickUser
+func PickUser(user *entity.User) UserPresenter {
+	userPresenter := UserPresenter{
+		DisplayName: user.DisplayName.String(),
+	}
+	return userPresenter
 }

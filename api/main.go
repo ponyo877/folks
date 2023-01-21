@@ -63,6 +63,7 @@ func main() {
 	messageService := room.NewService(messageRepository)
 
 	e := echo.New()
+	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	handler.MakeRoomHandlers(e, messageService)

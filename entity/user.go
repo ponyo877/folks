@@ -1,7 +1,11 @@
 package entity
 
 type User struct {
-	ID             UID
-	DisplayName    DisplayName
-	OneWordMessage Text
+	DisplayName DisplayName
+}
+
+func NewUser(displayName string) User {
+	return User{
+		DisplayName: NewDisplayName(displayName),
+	}
 }

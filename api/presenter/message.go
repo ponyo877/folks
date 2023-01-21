@@ -53,3 +53,12 @@ func MarshalMessage(message *entity.Message) MessageResponcePresenter {
 	}
 	return messagePresenter
 }
+
+// MarshalMessages
+func MarshalMessages(messages []*entity.Message) []MessageResponcePresenter {
+	var messageResponcePresenterList []MessageResponcePresenter
+	for _, message := range messages {
+		messageResponcePresenterList = append(messageResponcePresenterList, MarshalMessage(message))
+	}
+	return messageResponcePresenterList
+}

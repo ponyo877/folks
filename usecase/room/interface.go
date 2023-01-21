@@ -31,4 +31,6 @@ type UseCase interface {
 	ListRoom() ([]*entity.Room, error)
 	CreateRoom(room *entity.Room) error
 	GetRoom(roomID entity.UID) (*entity.Room, error)
+	WriteMessage(session *entity.Session) error
+	ReadMessage(session *entity.Session) error
 }

@@ -70,7 +70,6 @@
 
 <body>
   <h1>😎チャット</h1>
-  名前 <input type="text" id="text_username" value="ponyo"><br />
   <form action="" onsubmit="event.preventDefault(); onsubmitButton_Send();">
     <input type="text" id="input_message" autocomplete="off" autofocus /><input type="submit" value="▶️" />
   </form>
@@ -81,8 +80,8 @@
     const g_elementListMessage = document.getElementById("list_message");
 
     let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room" + "/" + getParam("roomID"));
-    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room" + "/" + getParam("roomID"));
+    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room/" + getParam("roomID"));
+    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
 
     function onsubmitButton_Send() {
       let strMessage = g_elementInputMessage.value;
@@ -91,7 +90,6 @@
       }
       ipAddress = "127.0.0.1"
       var message = {
-        "userName": document.getElementById("text_username").value,
         "ipAddress": ipAddress,
         "roomID": "12345678-0000-0000-0000-000000000001",
         "message": strMessage,
@@ -152,7 +150,15 @@
 
       return postElement
     }
-
+    // fetch(window.location.protocol + "//" + window.location.host + "/v1/room/log/" + getParam("roomID"))
+    fetch(window.location.protocol + "//" + window.location.host + ":8080/v1/room/log/" + getParam("roomID"))
+    .then(response => {
+        return response.json().then(dataList => {
+          for (let i = 0; i < dataList.length; i++){
+            g_elementListMessage.append(getPostElement(dataList[i]));
+          }
+        });
+    });
     g_socket.onmessage = (event) => {
       let data = JSON.parse(event.data);
       g_elementListMessage.append(getPostElement(data));
