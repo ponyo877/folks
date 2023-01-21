@@ -80,8 +80,8 @@
     const g_elementListMessage = document.getElementById("list_message");
 
     let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room/" + getParam("roomID"));
-    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
+    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room/" + getParam("roomID"));
+    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
 
     function onsubmitButton_Send() {
       let strMessage = g_elementInputMessage.value;
@@ -150,8 +150,8 @@
 
       return postElement
     }
-    // fetch(window.location.protocol + "//" + window.location.host + "/v1/room/log/" + getParam("roomID"))
-    fetch(window.location.protocol + "//" + window.location.host + ":8080/v1/room/log/" + getParam("roomID"))
+    fetch(window.location.protocol + "//" + window.location.host + "/v1/room/log/" + getParam("roomID"))
+    // fetch(window.location.protocol + "//" + window.location.host + ":8080/v1/room/log/" + getParam("roomID"))
     .then(response => {
         return response.json().then(dataList => {
           for (let i = 0; i < dataList.length; i++){
