@@ -6,18 +6,18 @@ import (
 
 // Session
 type Session struct {
-	UserDisplayName DisplayName
-	RoomID          UID
-	Conn            *websocket.Conn // 本来はフレームワークをentityに持ち込むべきじゃない
-	IsDone          chan struct{}
-	IsClosed        bool
+	User     User
+	RoomID   UID
+	Conn     *websocket.Conn // 本来はフレームワークをentityに持ち込むべきじゃない
+	IsDone   chan struct{}
+	IsClosed bool
 }
 
-func NewSession(displayName DisplayName, roomID UID, conn *websocket.Conn) *Session {
+func NewSession(user User, roomID UID, conn *websocket.Conn) *Session {
 	session := &Session{
-		UserDisplayName: displayName,
-		RoomID:          roomID,
-		Conn:            conn,
+		User:   user,
+		RoomID: roomID,
+		Conn:   conn,
 	}
 	return session
 }

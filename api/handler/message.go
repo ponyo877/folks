@@ -23,7 +23,7 @@ func MakeRoomHandlers(e *echo.Echo, service room.UseCase) {
 // ConnectRoom
 func ConnectRoom(service room.UseCase) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		displayName := entity.NewDisplayName(c.QueryParam("displayName"))
+		user := entity.NewUser(c.QueryParam("displayName"))
 		roomID, err := entity.StringToID(c.Param("roomID"))
 		if err != nil {
 			log.Errorf("ListRecentに失敗しました: %v", err)
@@ -33,7 +33,7 @@ func ConnectRoom(service room.UseCase) echo.HandlerFunc {
 		if err != nil {
 			log.Errorf("WebSocketの接続に失敗しました: %v", err)
 		}
-		session := entity.NewSession(displayName, roomID, conn)
+		session := entity.NewSession(user, roomID, conn)
 		go writeMessage(session, service)
 		go readMessage(session, service)
 		return nil
@@ -56,8 +56,9 @@ func writeMessage(session *entity.Session, service room.UseCase) {
 	defer func() {
 		ticker.Stop()
 		session.Close()
+		service.DisconnectRoom(session)
 	}()
-	messageChannel, err := service.ConnectRoom(session.RoomID)
+	messageChannel, err := service.ConnectRoom(session)
 	if err != nil {
 		return
 	}
@@ -82,7 +83,10 @@ func writeMessage(session *entity.Session, service room.UseCase) {
 
 // readMessage
 func readMessage(session *entity.Session, service room.UseCase) {
-	defer session.Close()
+	defer func() {
+		session.Close()
+		service.DisconnectRoom(session)
+	}()
 	for {
 		if session.IsClosed {
 			return
@@ -94,7 +98,7 @@ func readMessage(session *entity.Session, service room.UseCase) {
 			}
 			return
 		}
-		messageRequestPresenter.UserName = session.UserDisplayName.String()
+		messageRequestPresenter.UserName = session.User.DisplayName.String()
 		message := presenter.UnmarshalMessage(&messageRequestPresenter)
 		if err := service.Publish(session.RoomID, message); err != nil {
 			log.Errorf("WebSocketのメッセージの出版に失敗しました: %v", err)

@@ -7,10 +7,11 @@ import (
 )
 
 type RoomMySQLPresenter struct {
-	ID          string    `gorm:"column:id;primary_key"`
-	DisplayName string    `gorm:"column:display_name"`
-	UpdatedAt   time.Time `gorm:"column:updated_at"`
-	CreatedAt   time.Time `gorm:"column:created_at"`
+	ID          string               `gorm:"column:id;primary_key"`
+	DisplayName string               `gorm:"column:display_name"`
+	Members     []UserMySQLPresenter `gorm:"column:members"`
+	UpdatedAt   time.Time            `gorm:"column:updated_at"`
+	CreatedAt   time.Time            `gorm:"column:created_at"`
 }
 
 type RoomMySQLPresenterList []RoomMySQLPresenter

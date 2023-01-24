@@ -32,13 +32,16 @@ func (s *Service) Publish(roomID entity.UID, message *entity.Message) error {
 }
 
 // ConnectRoom
-func (s *Service) ConnectRoom(roomID entity.UID) (chan *entity.Message, error) {
-	if _, err := s.repository.GetRoom(roomID); err != nil {
+func (s *Service) ConnectRoom(session *entity.Session) (chan *entity.Message, error) {
+	if _, err := s.repository.GetRoom(session.RoomID); err != nil {
+		return nil, err
+	}
+	if err := s.repository.AddUser(session); err != nil {
 		return nil, err
 	}
 	messageChannel := make(chan *entity.Message)
 	s.repository.Subscribe(
-		roomID,
+		session.RoomID,
 		func(binary []byte) {
 			message, err := entity.DecodeMessage(binary)
 			if err != nil {
@@ -48,6 +51,13 @@ func (s *Service) ConnectRoom(roomID entity.UID) (chan *entity.Message, error) {
 		},
 	)
 	return messageChannel, nil
+}
+
+func (s *Service) DisconnectRoom(session *entity.Session) error {
+	if err := s.repository.RemoveUser(session); err != nil {
+		return err
+	}
+	return nil
 }
 
 // ListRecent
@@ -81,7 +91,7 @@ func (s *Service) WriteMessage(session *entity.Session) error {
 		ticker.Stop()
 		session.Close()
 	}()
-	messageChannel, err := s.ConnectRoom(session.RoomID)
+	messageChannel, err := s.ConnectRoom(session)
 	if err != nil {
 		return nil
 	}

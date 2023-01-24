@@ -15,6 +15,8 @@ type Writer interface {
 	Subscribe(roomID entity.UID, f func([]byte)) error
 	Append(roomID entity.UID, message *entity.Message) error
 	CreateRoom(room *entity.Room) error
+	AddUser(session *entity.Session) error
+	RemoveUser(session *entity.Session) error
 }
 
 // Repository interface
@@ -26,7 +28,8 @@ type Repository interface {
 // UseCase interface
 type UseCase interface {
 	Publish(roomID entity.UID, message *entity.Message) error
-	ConnectRoom(roomID entity.UID) (chan *entity.Message, error)
+	ConnectRoom(session *entity.Session) (chan *entity.Message, error)
+	DisconnectRoom(session *entity.Session) error
 	ListRecent(roomID entity.UID) ([]*entity.Message, error)
 	ListRoom() ([]*entity.Room, error)
 	CreateRoom(room *entity.Room) error
