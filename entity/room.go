@@ -3,6 +3,7 @@ package entity
 type Room struct {
 	ID          UID
 	DisplayName DisplayName
+	Users       []*User
 }
 
 func NewRoom(displayName DisplayName) *Room {
@@ -10,4 +11,10 @@ func NewRoom(displayName DisplayName) *Room {
 		ID:          NewUID(),
 		DisplayName: displayName,
 	}
+}
+
+// SetUsers
+func (r *Room) AddUsers(users []*User) *Room {
+	r.Users = users
+	return r
 }

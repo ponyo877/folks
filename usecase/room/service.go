@@ -67,7 +67,19 @@ func (s *Service) ListRecent(roomID entity.UID) ([]*entity.Message, error) {
 
 // ListRoom
 func (s *Service) ListRoom() ([]*entity.Room, error) {
-	return s.repository.ListRoom()
+	rooms, err := s.repository.ListRoom()
+	if err != nil {
+		return nil, err
+	}
+	var newRooms []*entity.Room
+	for _, room := range rooms {
+		users, err := s.repository.ListUser(room.ID)
+		if err != nil {
+			return nil, err
+		}
+		newRooms = append(newRooms, room.AddUsers(users))
+	}
+	return newRooms, nil
 }
 
 // CreateRoom

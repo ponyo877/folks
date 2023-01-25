@@ -24,6 +24,6 @@ func StringToHash(value string) Hash {
 	}
 }
 
-func (hash *Hash) String() string {
-	return hash.value
+func (h *Hash) String() string {
+	return h.value
 }

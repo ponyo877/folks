@@ -54,9 +54,9 @@ func generateConnection(writer http.ResponseWriter, reader *http.Request) (*webs
 func writeMessage(session *entity.Session, service room.UseCase) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer func() {
+		service.DisconnectRoom(session)
 		ticker.Stop()
 		session.Close()
-		service.DisconnectRoom(session)
 	}()
 	messageChannel, err := service.ConnectRoom(session)
 	if err != nil {
@@ -84,8 +84,8 @@ func writeMessage(session *entity.Session, service room.UseCase) {
 // readMessage
 func readMessage(session *entity.Session, service room.UseCase) {
 	defer func() {
-		session.Close()
 		service.DisconnectRoom(session)
+		session.Close()
 	}()
 	for {
 		if session.IsClosed {

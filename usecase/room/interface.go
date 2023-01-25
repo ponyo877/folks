@@ -7,6 +7,7 @@ type Reader interface {
 	ListRecent(roomID entity.UID, size int64) ([]*entity.Message, error)
 	ListRoom() ([]*entity.Room, error)
 	GetRoom(roomID entity.UID) (*entity.Room, error)
+	ListUser(roomID entity.UID) ([]*entity.User, error)
 }
 
 // Writer interface

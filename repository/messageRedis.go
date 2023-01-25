@@ -13,7 +13,13 @@ type UserMySQLPresenter struct {
 
 type UserMySQLPresenterList []UserMySQLPresenter
 
-// TODO: entity.User -> UserMySQLPresenterを書いてmessageMySQLのListRoomに追加する
+// userEntity
+func userEntity(user *entity.User) *UserMySQLPresenter {
+	return &UserMySQLPresenter{
+		ID:          user.ID.String(),
+		DisplayName: user.DisplayName.String(),
+	}
+}
 
 // Append
 func (r *MessageRepository) Append(roomID entity.UID, message *entity.Message) error {
@@ -46,7 +52,7 @@ func (r *MessageRepository) AddUser(session *entity.Session) error {
 	roomID := session.RoomID.String()
 	userID := session.User.ID.String()
 	displayName := session.User.DisplayName.String()
-	if _, err := r.kvs.HSet(context.Background(), roomID, userID, displayName).Result(); err != nil {
+	if _, err := r.kvs.HSet(context.Background(), "members_"+roomID, userID, displayName).Result(); err != nil {
 		return err
 	}
 	return nil
@@ -56,15 +62,15 @@ func (r *MessageRepository) AddUser(session *entity.Session) error {
 func (r *MessageRepository) RemoveUser(session *entity.Session) error {
 	roomID := session.RoomID.String()
 	userID := session.User.ID.String()
-	if _, err := r.kvs.HDel(context.Background(), roomID, userID).Result(); err != nil {
+	if _, err := r.kvs.HDel(context.Background(), "members_"+roomID, userID).Result(); err != nil {
 		return err
 	}
 	return nil
 }
 
-// listUser
-func (r *MessageRepository) listUser(roomID entity.UID) ([]*entity.User, error) {
-	userMap, err := r.kvs.HGetAll(context.Background(), roomID.String()).Result()
+// ListUser
+func (r *MessageRepository) ListUser(roomID entity.UID) ([]*entity.User, error) {
+	userMap, err := r.kvs.HGetAll(context.Background(), "members_"+roomID.String()).Result()
 	if err != nil {
 		return nil, err
 	}
