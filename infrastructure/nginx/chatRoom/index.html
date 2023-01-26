@@ -2,172 +2,172 @@
 <html lang="ja">
 
 <head>
-  <meta charset="utf-8">
-  <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:90px;%22>😎</text></svg>">
-  <title>チャット</title>
-  <style type="text/css" media="screen">
-    .post {
-      position: relative;
-      display: flex;
-      width: 100%;
-      padding: 0 8px 0 5px;
-      margin: 0 auto;
-      table-layout: fixed;
-    }
+    <meta charset="utf-8">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%%22 y=%2250%%22 style=%22dominant-baseline:central;text-anchor:middle;font-size:90px;%22>😎</text></svg>">
+    <title>チャット</title>
+    <style type="text/css" media="screen">
+        .post {
+            position: relative;
+            display: flex;
+            width: 100%;
+            padding: 0 8px 0 5px;
+            margin: 0 auto;
+            table-layout: fixed;
+        }
 
-    .header {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      margin-bottom: 2px;
-      white-space: nowrap;
-    }
+        .header {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 2px;
+            white-space: nowrap;
+        }
 
-    .name {
-      display: flex;
-      min-width: 0;
-      flex: 0 auto;
-      margin-right: 8px;
-      font-weight: 600;
-      text-overflow: ellipsis;
-    }
+        .name {
+            display: flex;
+            min-width: 0;
+            flex: 0 auto;
+            margin-right: 8px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+        }
 
-    .timestamp {
-      align-items: center !important;
-      -webkit-box-align: center !important;
-      margin-right: 4px;
-      font-size: .9em;
-      opacity: .6;
-    }
+        .timestamp {
+            align-items: center !important;
+            -webkit-box-align: center !important;
+            margin-right: 4px;
+            font-size: .9em;
+            opacity: .6;
+        }
 
-    .message {
-      transition-property: height;
-      transition-duration: 250ms;
-      transition-timing-function: ease;
-      height: auto;
-      overflow: visible;
-      position: relative;
-      width: 100%;
-      margin: 0;
-      font-size: 13.5px;
-      line-height: 1.6em;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+        .message {
+            transition-property: height;
+            transition-duration: 250ms;
+            transition-timing-function: ease;
+            height: auto;
+            overflow: visible;
+            position: relative;
+            width: 100%;
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.6em;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
 
-    .icon {
-      padding-right: 10px;
-      text-align: right;
-    }
+        .icon {
+            padding-right: 10px;
+            text-align: right;
+        }
 
-    .image {
-      width: 32px;
-      height: 32px;
-    }
-  </style>
+        .image {
+            width: 32px;
+            height: 32px;
+        }
+    </style>
 </head>
 
 <body>
-  <h1>😎チャット</h1>
-  <form action="" onsubmit="event.preventDefault(); onsubmitButton_Send();">
-    <input type="text" id="input_message" autocomplete="off" autofocus /><input type="submit" value="▶️" />
-  </form>
-  <ul id="list_message"></ul>
+    <h1>😎チャット</h1>
+    <form action="" onsubmit="event.preventDefault(); onsubmitButton_Send();">
+        <input type="text" id="input_message" autocomplete="off" autofocus /><input type="submit" value="▶️" />
+    </form>
+    <ul id="list_message"></ul>
 
-  <script>
-    const g_elementInputMessage = document.getElementById("input_message");
-    const g_elementListMessage = document.getElementById("list_message");
+    <script>
+        const g_elementInputMessage = document.getElementById("input_message");
+        const g_elementListMessage = document.getElementById("list_message");
 
-    let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
-    // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
+        let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+        const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
+        // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
 
-    function onsubmitButton_Send() {
-      let strMessage = g_elementInputMessage.value;
-      if (!strMessage) {
-        return;
-      }
-      ipAddress = "127.0.0.1"
-      var message = {
-        "ipAddress": ipAddress,
-        "roomID": "12345678-0000-0000-0000-000000000001",
-        "message": strMessage,
-      }
-      g_socket.send(JSON.stringify(message));
-      g_elementInputMessage.value = "";
-      return false;
-    }
+        function onsubmitButton_Send() {
+            let strMessage = g_elementInputMessage.value;
+            if (!strMessage) {
+                return;
+            }
+            ipAddress = "127.0.0.1"
+            var message = {
+                "ipAddress": ipAddress,
+                "roomID": "12345678-0000-0000-0000-000000000001",
+                "message": strMessage,
+            }
+            g_socket.send(JSON.stringify(message));
+            g_elementInputMessage.value = "";
+            return false;
+        }
 
-    function getFormatedTime(unixtime) {
-      var date = new Date(unixtime);
-      return date.toLocaleTimeString();
-    }
+        function getFormatedTime(unixtime) {
+            var date = new Date(unixtime);
+            return date.toLocaleTimeString();
+        }
 
-    function getParam(name, url) {
-      if (!url) url = window.location.href;
-      name = name.replace(/[\[\]]/g, "\\$&");
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-      if (!results) return null;
-      if (!results[2]) return '';
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
-    }
+        function getParam(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
 
-    function getPostElement(message) {
-      var messageElement = document.createElement('div');
-      messageElement.className = 'message';
-      messageElement.textContent = message["message"];
+        function getPostElement(message) {
+            var messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.textContent = message["message"];
 
-      var headerElement = document.createElement('div');
-      headerElement.className = 'header';
+            var headerElement = document.createElement('div');
+            headerElement.className = 'header';
 
-      var timestampElement = document.createElement('div');
-      timestampElement.className = 'timestamp';
-      timestampElement.textContent = getFormatedTime(message["createdAt"]);
+            var timestampElement = document.createElement('div');
+            timestampElement.className = 'timestamp';
+            timestampElement.textContent = getFormatedTime(message["createdAt"]);
 
-      var nameElement = document.createElement('div');
-      nameElement.className = 'name';
-      nameElement.textContent = message["userName"];
+            var nameElement = document.createElement('div');
+            nameElement.className = 'name';
+            nameElement.textContent = message["userName"];
 
-      var iconElement = document.createElement('div');
-      iconElement.className = 'icon';
-      var iconImage = document.createElement('img')
-      iconImage.src = 'https://d19ta9rijs3cxg.cloudfront.net/wp-content/uploads/sites/2/2018/09/new_default_icon.png'
-      iconImage.className = 'image'
-      iconElement.appendChild(iconImage)
+            var iconElement = document.createElement('div');
+            iconElement.className = 'icon';
+            var iconImage = document.createElement('img')
+            iconImage.src = 'https://d19ta9rijs3cxg.cloudfront.net/wp-content/uploads/sites/2/2018/09/new_default_icon.png'
+            iconImage.className = 'image'
+            iconElement.appendChild(iconImage)
 
-      let postElement = document.createElement("dev");
-      postElement.className = 'post'
+            let postElement = document.createElement("dev");
+            postElement.className = 'post'
 
-      headerElement.appendChild(nameElement)
-      headerElement.appendChild(timestampElement)
-      var notIconElement = document.createElement('div')
-      notIconElement.appendChild(headerElement)
-      notIconElement.appendChild(messageElement)
-      postElement.appendChild(iconElement)
-      postElement.appendChild(notIconElement)
+            headerElement.appendChild(nameElement)
+            headerElement.appendChild(timestampElement)
+            var notIconElement = document.createElement('div')
+            notIconElement.appendChild(headerElement)
+            notIconElement.appendChild(messageElement)
+            postElement.appendChild(iconElement)
+            postElement.appendChild(notIconElement)
 
-      return postElement
-    }
-    fetch(window.location.protocol + "//" + window.location.host + "/v1/room/log/" + getParam("roomID"))
-    // fetch(window.location.protocol + "//" + window.location.host + ":8080/v1/room/log/" + getParam("roomID"))
-    .then(response => {
-        return response.json().then(dataList => {
-          for (let i = 0; i < dataList.length; i++){
-            g_elementListMessage.append(getPostElement(dataList[i]));
-          }
-        });
-    });
-    g_socket.onmessage = (event) => {
-      let data = JSON.parse(event.data);
-      g_elementListMessage.append(getPostElement(data));
-    };
+            return postElement
+        }
+        fetch(window.location.protocol + "//" + window.location.host + "/v1/room/log/" + getParam("roomID"))
+        // fetch(window.location.protocol + "//" + window.location.host + ":8080/v1/room/log/" + getParam("roomID"))
+            .then(response => {
+                return response.json().then(dataList => {
+                    for (let i = 0; i < dataList.length; i++) {
+                        g_elementListMessage.append(getPostElement(dataList[i]));
+                    }
+                });
+            });
+        g_socket.onmessage = (event) => {
+            let data = JSON.parse(event.data);
+            g_elementListMessage.append(getPostElement(data));
+        };
 
-    g_socket.onclose = (event) => {
-      console.error("Unexpected : Chat socket closed.");
-    };
-  </script>
+        g_socket.onclose = (event) => {
+            console.error("Unexpected : Chat socket closed.");
+        };
+    </script>
 </body>
 
 </html>
