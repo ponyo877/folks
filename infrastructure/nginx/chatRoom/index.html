@@ -76,14 +76,18 @@
     <ul id="list_message"></ul>
 
     <script>
+        let origin = window.location.protocol + "//" + window.location.host
+        let ws_scheme = window.location.protocol == "https:" ? "wss:" : "ws:";
+        let ws_origin = ws_scheme + "//" + window.location.host
+        if (window.location.host == "localhost") {
+            origin += ":8080"
+            ws_origin += ":8080"
+        }
         const g_elementInputMessage = document.getElementById("input_message");
         const g_elementListMessage = document.getElementById("list_message");
+        const g_socket = new WebSocket(ws_origin + "/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
 
-        let ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + "/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
-        // const g_socket = new WebSocket(ws_scheme + "://" + window.location.host + ":8080/v1/room/" + getParam("roomID") + "?displayName=" + getParam("displayName"));
-
-        function onsubmitButton_Send() {
+        const onsubmitButton_Send = () => {
             let strMessage = g_elementInputMessage.value;
             if (!strMessage) {
                 return;
@@ -150,8 +154,7 @@
 
             return postElement
         }
-        fetch(window.location.protocol + "//" + window.location.host + "/v1/room/log/" + getParam("roomID"))
-        // fetch(window.location.protocol + "//" + window.location.host + ":8080/v1/room/log/" + getParam("roomID"))
+        fetch(origin + "/v1/room/log/" + getParam("roomID"))
             .then(response => {
                 return response.json().then(dataList => {
                     for (let i = 0; i < dataList.length; i++) {
@@ -159,6 +162,7 @@
                     }
                 });
             });
+
         g_socket.onmessage = (event) => {
             let data = JSON.parse(event.data);
             g_elementListMessage.append(getPostElement(data));

@@ -109,8 +109,16 @@
 <body>
     <h1>😎チャット</h1>
     名前 <input onchange="changeHref()" type="text" id="username"><br />
+    <form action="" onsubmit="event.preventDefault(); onsubmitButton_Send();">
+        ルーム名 <input type="text" id="input_roomname" autocomplete="off" autofocus /><input type="submit" value="🖋" />
+    </form>
     <ul id="list_room"></ul>
     <script>
+        let origin = window.location.protocol + "//" + window.location.host
+        if (window.location.host == "localhost") {
+            origin += ":8080"
+        }
+        const g_elementInputRoomname = document.getElementById("input_roomname")
         const g_elementListRoom = document.getElementById("list_room");
         const changeHref = () => {
             bottons = document.getElementsByClassName("button")
@@ -121,8 +129,22 @@
                 bottons[i].href = url.toString()
             }
         }
-        fetch(window.location.protocol + "//" + window.location.host + "/v1/room/log/" + getParam("roomID"))
-        // fetch(window.location.protocol + "//" + window.location.host + ":8080/v1/room")
+        const onsubmitButton_Send = () => {
+            let strRoomname = g_elementInputRoomname.value;
+            if (!strRoomname) {
+                return;
+            }
+            fetch(origin + "/v1/room", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "name": strRoomname,
+                })
+            })
+        }
+        fetch(origin + "/v1/room")
             .then(response => {
                 return response.json().then(dataList => {
                     for (let i = 0; i < dataList.length; i++) {
